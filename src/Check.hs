@@ -31,9 +31,20 @@ conv env = curry $ \case
 check ∷ Env → Ctx → Term → VType → M ()
 check env ctx = curry $ \case
 
-  --    Γ, v:t ⊢ e ⇐ f v
+  --    Γ, v:τ ⊢ e ⇐ f v
   -- -----------------------
-  -- Γ ⊢ λv. e ⇐ ∀ v:t. f v
+  -- Γ ⊢ λv. e ⇐ ∀ v:τ. f v
   (Λ v e, VΠ v_ t f) →
     let v' = fresh env v_
     in check ((v, VVar v'):env) ((v, t):ctx) e (f (VVar v'))
+
+  --        Γ ⊢ τ′ ⇐ *
+  --        Γ ⊢ v ⇐ τ′
+  --      Γ, v:τ′ ⊢ e ⇐ τ
+  -- --------------------------
+  -- Γ ⊢ let v:τ′ = x in e ⇐ τ
+  (Let v t' x e, t) → do
+    check env ctx t' VType
+    let vt' = eval env t'
+    check env ctx x vt'
+    check ((v, eval env x):env) ((v, vt'):ctx) e t
