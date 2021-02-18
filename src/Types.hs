@@ -14,6 +14,8 @@ data Term
   | Type
   deriving Show
 
+type VType = Val
+
 data Val
   = VVar Name
   | Val :$$ ~Val
@@ -22,3 +24,4 @@ data Val
   | VType
 
 type Env = [(Name, Val)]
+type Ctx = [(Name, VType)]
