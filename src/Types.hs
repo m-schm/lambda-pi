@@ -12,6 +12,7 @@ data Term
   | Term :$ Term
   | Let Name Type Term Term
   | Type
+  | Hole
   deriving Show
 
 type VType = Val

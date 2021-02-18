@@ -43,6 +43,7 @@ pi = do
 expr1 ∷ Parser Term
 expr1 = Var  <$> ident
     <|> Type <$  symbol "*"
+    <|> Hole <$  symbol "_"
     <|> parens expr
 
 fnOrApp ∷ Parser Term

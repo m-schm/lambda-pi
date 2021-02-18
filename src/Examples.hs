@@ -1,4 +1,4 @@
-module Examples (ex1, ex2, ex3) where
+module Examples (ex1, ex2, ex3, ex4) where
 
 import Parse (src)
 import Types (Term)
@@ -13,7 +13,7 @@ parse = unsafeFromRight . runParser src ""
 ex1 ∷ Term
 ex1 = parse "\
   \ let id : (A:*) -> A -> A = \\A x. x in \
-  \ let foo : * = * in \
+  \ let _ : * = * in \
   \ id \
   \ "
 
@@ -21,7 +21,7 @@ ex2 ∷ Term
 ex2 = parse "\
   \ let id : (A:*) -> A -> A = \\A x. x in \
   \ let const : (A B : *) -> A -> B -> A = \\_ _ x y. x in \
-  \ id ((A B : *) -> A -> B -> A) const \
+  \ id _ const \
   \ "
 
 ex3 ∷ Term
@@ -37,4 +37,13 @@ ex3 = parse "\
   \ let 100 : Nat = mul 10 10 in \
   \ let 10k : Nat = sqr 100 in \
   \ 10k \
+  \ "
+
+ex4 ∷ Term
+ex4 = parse "\
+  \ let List : * -> * = \\A. (L:*) -> (A->L->L) -> L -> L in \
+  \ let cons : (A:*) -> A -> List A -> List A = \
+  \   \\A x xs L c n -> c x (xs _ c n) in \
+  \ let nil : (A:*) -> List A = \\A L _ n. n in \
+  \ cons _ * (cons _ * (nil _)) \
   \ "
