@@ -1,5 +1,10 @@
 module Check where
 
+import Eval
+import Types
+
+import Relude
+
 conv ∷ Env → Val → Val → Bool
 conv env = curry $ \case
   (VType, VType) → True

@@ -2,7 +2,7 @@ module Eval where
 
 import Types
 
-import Prelude (lookup)
+import Data.List (lookup)
 import Relude
 
 fresh ∷ Env → Name → Name
