@@ -5,6 +5,9 @@ import Types
 
 import Relude
 
+type M = Either TypeError
+data TypeError = Mismatch Val Val
+
 conv ∷ Env → Val → Val → Bool
 conv env = curry $ \case
   (VType, VType) → True
@@ -24,3 +27,13 @@ conv env = curry $ \case
   (VVar v, VVar v') → v == v'
   (f :$$ x, g :$$ y) → conv env f g && conv env x y
   (_, _) → False
+
+check ∷ Env → Ctx → Term → VType → M ()
+check env ctx = curry $ \case
+
+  --    Γ, v:t ⊢ e ⇐ f v
+  -- -----------------------
+  -- Γ ⊢ λv. e ⇐ ∀ v:t. f v
+  (Λ v e, VΠ v_ t f) →
+    let v' = fresh env v_
+    in check ((v, VVar v'):env) ((v, t):ctx) e (f (VVar v'))
