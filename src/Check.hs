@@ -95,6 +95,7 @@ check env ctx = curry $ \case
 
 infer ∷ Env → Ctx → Term → M VType
 infer env ctx = \case
+
   -- v : τ ∈ Γ
   -- ----------
   -- Γ ⊢ v ⇒ τ
