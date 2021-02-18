@@ -3,10 +3,15 @@ module Check where
 import Eval
 import Types
 
+import Data.List (lookup)
 import Relude
 
 type M = Either TypeError
-data TypeError = Mismatch Val Val
+data TypeError
+  = Mismatch Val Val
+  | CantInferLambda
+  | UnknownName Name
+  | NotPi Val
 
 report ∷ TypeError → M a
 report = Left
@@ -62,4 +67,46 @@ check env ctx = curry $ \case
       report $ Mismatch t it
 
 infer ∷ Env → Ctx → Term → M VType
-infer = undefined
+infer env ctx = \case
+  -- v : τ ∈ Γ
+  -- ----------
+  -- Γ ⊢ v ⇒ τ
+  Var v → case lookup v ctx of
+    Nothing → report $ UnknownName v
+    Just t  → pure t
+
+  -- ----------
+  -- Γ ⊢ * ⇒ *
+  Type → pure VType
+
+  -- Γ ⊢ f ⇒ ∀ a:τ. τ′
+  --     Γ ⊢ x ⇒ τ
+  -- ------------------
+  -- Γ ⊢ f x ⇒ τ′[x/a]
+  f :$ x → infer env ctx f >>= \case
+    VΠ _ t g → do
+      check env ctx x t
+      pure $ g (eval env x)
+    t → report $ NotPi t
+
+  Λ _ _ → report CantInferLambda
+
+  --     Γ ⊢ τ ⇐ *
+  --  Γ, v:τ ⊢ τ′ ⇐ *
+  -- ------------------
+  -- Γ ⊢ ∀ v:τ. τ′ ⇒ *
+  Π v t e → do
+    check env ctx t VType
+    check ((v, VVar v):env) ((v, eval env t):ctx) e VType
+    pure VType
+
+  --        Γ ⊢ τ′ ⇐ *
+  --        Γ ⊢ x ⇐ τ′
+  --     Γ, v:τ′ ⊢ e ⇒ τ
+  -- -------------------------
+  -- Γ ⊢ let v:τ′ = x in e ⇒ τ
+  Let v t x e → do
+    check env ctx t VType
+    let vt = eval env t
+    check env ctx x vt
+    infer ((v, eval env x):env) ((v, vt):ctx) e
