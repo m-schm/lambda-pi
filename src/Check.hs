@@ -8,6 +8,9 @@ import Relude
 type M = Either TypeError
 data TypeError = Mismatch Val Val
 
+report ∷ TypeError → M a
+report = Left
+
 conv ∷ Env → Val → Val → Bool
 conv env = curry $ \case
   (VType, VType) → True
@@ -48,3 +51,15 @@ check env ctx = curry $ \case
     let vt' = eval env t'
     check env ctx x vt'
     check ((v, eval env x):env) ((v, vt'):ctx) e t
+
+  -- Γ ⊢ e ⇒ τ′
+  -- Γ ⊢ τ ~ τ′
+  -- -----------
+  -- Γ ⊢ e ⇐ τ
+  (e, t) → do
+    it ← infer env ctx e
+    unless (conv env t it) $
+      report $ Mismatch t it
+
+infer ∷ Env → Ctx → Term → M VType
+infer = undefined
