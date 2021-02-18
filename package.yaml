@@ -29,6 +29,7 @@ default-extensions:
 - LambdaCase
 - NoImplicitPrelude
 - OverloadedStrings
+- Strict
 - TupleSections
 - UnicodeSyntax
 

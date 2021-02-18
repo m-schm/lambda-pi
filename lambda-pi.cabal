@@ -25,6 +25,7 @@ source-repository head
 
 library
   exposed-modules:
+      Eval
       Examples
       Parse
       Types
@@ -32,7 +33,7 @@ library
       Paths_lambda_pi
   hs-source-dirs:
       src
-  default-extensions: LambdaCase NoImplicitPrelude OverloadedStrings TupleSections UnicodeSyntax
+  default-extensions: LambdaCase NoImplicitPrelude OverloadedStrings Strict TupleSections UnicodeSyntax
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints
   build-depends:
       base
