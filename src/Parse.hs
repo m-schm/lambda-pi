@@ -54,7 +54,7 @@ fnOrApp = do
 
 expr ∷ Parser Term
 expr = lam <$ symbol "\\"   <*> some binder
-           <* symbol "->"   <*> expr
+           <* symbol "."    <*> expr
    <|> Let <$ keyword "let" <*> binder
            <* symbol ":"    <*> expr
            <* symbol "="    <*> expr
