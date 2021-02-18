@@ -23,9 +23,14 @@ dependencies:
 - base
 - relude
 - megaparsec
+- parser-combinators
 
 default-extensions:
+- LambdaCase
 - NoImplicitPrelude
+- OverloadedStrings
+- TupleSections
+- UnicodeSyntax
 
 library:
   source-dirs: src
