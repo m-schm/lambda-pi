@@ -19,7 +19,7 @@ ex1 = parse "\
 
 ex2 ∷ Term
 ex2 = parse "\
-  \ let id : (A:*) -> A -> A = \\A x. x in \
+  \ let id : (A:*) -> A -> A = \\_ x. x in \
   \ let const : (A B : *) -> A -> B -> A = \\_ _ x y. x in \
   \ id _ const \
   \ "
@@ -27,11 +27,11 @@ ex2 = parse "\
 ex3 ∷ Term
 ex3 = parse "\
   \ let Nat : * = (N:*) -> (N -> N) -> N -> N in \
-  \ let 5 : Nat = \\N s z. s (s (s (s (s z)))) in \
+  \ let 5 : Nat = \\_ s z. s (s (s (s (s z)))) in \
   \ let add : Nat -> Nat -> Nat = \
-  \   \\a b N s z. a N s (b N s z) in \
+  \   \\a b _ s z. a _ s (b _ s z) in \
   \ let mul : Nat -> Nat -> Nat = \
-  \   \\a b N s z. a N (b N s) z in \
+  \   \\a b _ s z. a _ (b _ s) z in \
   \ let sqr : Nat -> Nat = \\a. mul a a in \
   \ let 10 : Nat = add 5 5 in \
   \ let 100 : Nat = mul 10 10 in \
@@ -43,7 +43,7 @@ ex4 ∷ Term
 ex4 = parse "\
   \ let List : * -> * = \\A. (L:*) -> (A->L->L) -> L -> L in \
   \ let cons : (A:*) -> A -> List A -> List A = \
-  \   \\A x xs L c n -> c x (xs _ c n) in \
-  \ let nil : (A:*) -> List A = \\A L _ n. n in \
+  \   \\_ x xs L c n -> c x (xs _ c n) in \
+  \ let nil : (A:*) -> List A = \\_ _ _ n. n in \
   \ cons _ * (cons _ * (nil _)) \
   \ "
