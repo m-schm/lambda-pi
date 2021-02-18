@@ -32,9 +32,11 @@ ex3 = parse "\
   \   \\a b _ s z. a _ s (b _ s z) in \
   \ let mul : Nat -> Nat -> Nat = \
   \   \\a b _ s z. a _ (b _ s) z in \
-  \ let sqr : Nat -> Nat = \\a. mul a a in \
-  \ let 10 : Nat = add 5 5 in \
-  \ let 100 : Nat = mul 10 10 in \
+  \ let join : (A B : *) -> (A -> A -> B) -> A -> B = \
+  \   \\_ _ f x. f x x in \
+  \ let 10 : Nat = join _ _ add 5 in \
+  \ let sqr : Nat -> Nat = join _ _ mul in \
+  \ let 100 : Nat = sqr 10 in \
   \ let 10k : Nat = sqr 100 in \
   \ 10k \
   \ "
