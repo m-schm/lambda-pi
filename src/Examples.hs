@@ -20,7 +20,7 @@ ex1 = parse "\
 ex2 ∷ Term
 ex2 = parse "\
   \ let id : (A:*) -> A -> A = \\A x. x in \
-  \ let const : (A B : *) -> A -> B -> A = \\_ _ x y. x \
+  \ let const : (A B : *) -> A -> B -> A = \\_ _ x y. x in \
   \ id ((A B : *) -> A -> B -> A) const \
   \ "
 
