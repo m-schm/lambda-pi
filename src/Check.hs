@@ -19,22 +19,48 @@ report = Left
 
 conv ∷ Env → Val → Val → Bool
 conv env = curry $ \case
+
+  -- ---------
+  -- Γ ⊢ * ~ *
   (VType, VType) → True
+
+  --         Γ ⊢ σ₁ ~ σ₂
+  --      Γ, x:σᵢ ⊢ τ₁ ~ τ₂
+  -- ---------------------------
+  -- Γ ⊢ ∀ x:σ₁. τ₁ ~ ∀ x:σ₂. τ₂
   (VΠ v_ t f, VΠ _ u g) →
     let v = fresh env $ "?" <> v_
     in conv env t u
     && conv ((v, VVar v):env) (f (VVar v)) (g (VVar v))
+
+  --   Γ, v ⊢ e₁ ~ e₂
+  -- -------------------
+  -- Γ ⊢ λv. e₁ ~ λv. e₂
   (Vλ v_ f, Vλ _ g) →
     let v = fresh env $ "?" <> v_
     in conv ((v, VVar v):env) (f (VVar v)) (g (VVar v))
+
+  -- Γ, v ⊢ e₁ ~ e₂ v
+  -- ----------------
+  -- Γ ⊢ λv. e₁ ~ e₂
   (Vλ v_ f, x) →
     let v = fresh env $ "?" <> v_
     in conv ((v, VVar v):env) (f (VVar v)) (x :$$ VVar v)
   (x, Vλ v_ f) →
     let v = fresh env $ "?" <> v_
     in conv ((v, VVar v):env) (x :$$ VVar v) (f (VVar v))
+
+  --   v₁ = v₂
+  -- -----------
+  -- Γ ⊢ v₁ ~ v₂
   (VVar v, VVar v') → v == v'
+
+  --    Γ ⊢ f₁ ~ f₂
+  --    Γ ⊢ x₁ ~ x₂
+  -- -----------------
+  -- Γ ⊢ f₁ x₁ ~ f₂ x₂
   (f :$$ x, g :$$ y) → conv env f g && conv env x y
+
   (_, _) → False
 
 check ∷ Env → Ctx → Term → VType → M ()
