@@ -8,10 +8,11 @@ import Relude
 
 type M = Either TypeError
 data TypeError
-  = Mismatch Val Val
+  = Mismatch Term Term
   | CantInferLambda
   | UnknownName Name
-  | NotPi Val
+  | NotPi Term
+  deriving Show
 
 report ∷ TypeError → M a
 report = Left
@@ -64,7 +65,7 @@ check env ctx = curry $ \case
   (e, t) → do
     it ← infer env ctx e
     unless (conv env t it) $
-      report $ Mismatch t it
+      report $ Mismatch (quote env t) (quote env it)
 
 infer ∷ Env → Ctx → Term → M VType
 infer env ctx = \case
@@ -87,7 +88,7 @@ infer env ctx = \case
     VΠ _ t g → do
       check env ctx x t
       pure $ g (eval env x)
-    t → report $ NotPi t
+    t → report $ NotPi (quote env t)
 
   Λ _ _ → report CantInferLambda
 
