@@ -80,7 +80,7 @@ infer env ctx = \case
   Type → pure VType
 
   -- Γ ⊢ f ⇒ ∀ a:τ. τ′
-  --     Γ ⊢ x ⇒ τ
+  --     Γ ⊢ x ⇐ τ
   -- ------------------
   -- Γ ⊢ f x ⇒ τ′[x/a]
   f :$ x → infer env ctx f >>= \case
