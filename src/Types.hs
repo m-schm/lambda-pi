@@ -11,6 +11,19 @@ import Relude hiding (Type)
 type Name = Text
 type Type = Term
 
+data Surface
+  = SVar Name
+  | Sλ Name Surface
+  | SΠ Name Surface Surface
+  | SApp Surface Surface
+  | SLet Name Surface Surface Surface
+  | SType
+  | SHole
+  deriving Show
+
+data BD = Bound | Defined
+  deriving Show
+
 data Term
   = Var Name
   | Λ Name Term
@@ -18,14 +31,16 @@ data Term
   | Term :$ Term
   | Let Name Type Term Term
   | Type
-  | Hole
+  | Meta MetaVar
+  | InsertedMeta MetaVar [BD]
   deriving Show
 
 type VType = Val
+type Spine = [Val]
 
 data Val
-  = VVar Name
-  | Val :$$ ~Val
+  = VFlex MetaVar Spine
+  | VRigid Name Spine
   | Vλ Name (Val → Val)
   | VΠ Name Val (Val → Val)
   | VType
