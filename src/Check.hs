@@ -25,9 +25,9 @@ conv env = curry $ \case
   (VType, VType) → True
 
   --         Γ ⊢ σ₁ ~ σ₂
-  --      Γ, x:σᵢ ⊢ τ₁ ~ τ₂
+  --      Γ, v:σᵢ ⊢ τ₁ ~ τ₂
   -- ---------------------------
-  -- Γ ⊢ ∀ x:σ₁. τ₁ ~ ∀ x:σ₂. τ₂
+  -- Γ ⊢ ∀ v:σ₁. τ₁ ~ ∀ v:σ₂. τ₂
   (VΠ v_ t f, VΠ _ u g) →
     let v = fresh env $ "?" <> v_
     in conv env t u
@@ -107,10 +107,10 @@ infer env ctx = \case
   -- Γ ⊢ * ⇒ *
   Type → pure VType
 
-  -- Γ ⊢ f ⇒ ∀ a:τ. τ′
+  -- Γ ⊢ f ⇒ ∀ v:τ. τ′
   --     Γ ⊢ x ⇐ τ
   -- ------------------
-  -- Γ ⊢ f x ⇒ τ′[x/a]
+  -- Γ ⊢ f x ⇒ τ′[x/v]
   f :$ x → infer env ctx f >>= \case
     VΠ _ t g → do
       check env ctx x t
