@@ -1,6 +1,12 @@
 module Types where
 
+import Control.Monad.Except
+import Control.Monad.ST (ST)
+import qualified Data.IntMap as IM
+import Data.STRef
 import Relude hiding (Type)
+
+{-# ANN module ("HLint: ignore Use camelCase" ∷ String) #-}
 
 type Name = Text
 type Type = Term
@@ -26,3 +32,45 @@ data Val
 
 type Env = [(Name, Val)]
 type Ctx = [(Name, VType)]
+
+data MetaEntry = Solved Val | Unsolved
+
+newtype MetaVar = MetaVar { unMetaVar ∷ Int }
+  deriving newtype (Eq, Show, Enum)
+
+data MetaCtx = MetaCtx
+  { nextMeta ∷ MetaVar
+  , metaCtx  ∷ IntMap MetaEntry
+  }
+
+data TypeError
+  = Mismatch Term Term
+  | CantInferLambda
+  | UnknownName Name
+  | NotPi Term
+  | CantUnify
+  | Internal_NoMetaVar MetaVar
+  deriving Show
+
+type M s = ReaderT (STRef s MetaCtx) (ExceptT TypeError (ST s))
+
+getMetaCtx ∷ M s MetaCtx
+getMetaCtx = join $ asks $ lift . lift . readSTRef
+
+modifyMetaCtx ∷ (MetaCtx → MetaCtx) → M s ()
+modifyMetaCtx f = join $ asks $ lift . lift . flip modifySTRef' f
+
+lookupMeta ∷ MetaVar → M s MetaEntry
+lookupMeta mv@(MetaVar v) = do
+  mctx ← metaCtx <$> getMetaCtx
+  whenNothing (IM.lookup v mctx) $
+    throwError $ Internal_NoMetaVar mv
+
+freshMetaVar ∷ M s MetaVar
+freshMetaVar = do
+  mv ← nextMeta <$> getMetaCtx
+  modifyMetaCtx $ \mctx@MetaCtx{metaCtx} → mctx
+    { nextMeta = succ mv
+    , metaCtx = IM.insert (unMetaVar mv) Unsolved metaCtx
+    }
+  pure mv

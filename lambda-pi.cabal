@@ -33,11 +33,13 @@ library
       Paths_lambda_pi
   hs-source-dirs:
       src
-  default-extensions: LambdaCase NoImplicitPrelude OverloadedStrings Strict TupleSections UnicodeSyntax
+  default-extensions: DerivingStrategies GeneralizedNewtypeDeriving LambdaCase NamedFieldPuns NoImplicitPrelude OverloadedStrings Strict TupleSections UnicodeSyntax
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints
   build-depends:
       base
+    , containers
     , megaparsec
+    , mtl
     , parser-combinators
     , relude
   default-language: Haskell2010

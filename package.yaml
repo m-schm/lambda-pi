@@ -21,11 +21,16 @@ description:         Please see the README on GitHub at <https://github.com/m-sc
 dependencies:
 - base
 - relude
+- containers
 - megaparsec
+- mtl
 - parser-combinators
 
 default-extensions:
+- DerivingStrategies
+- GeneralizedNewtypeDeriving
 - LambdaCase
+- NamedFieldPuns
 - NoImplicitPrelude
 - OverloadedStrings
 - Strict
